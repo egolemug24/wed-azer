@@ -91,28 +91,28 @@ export default function SubscriptionsPage() {
           Сотни игр, эксклюзивные скидки и сетевая игра. Активация на ваш турецкий аккаунт за 15 минут.
         </p>
         
-        <div className="flex items-center justify-center pt-8 gap-4">
-          <div className="bg-ps-navy/50 p-1 rounded-2xl border border-white/5 flex">
-            {["1", "3", "12"].map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`px-8 py-3 rounded-xl text-sm font-bold transition-all ${
-                  period === p ? "bg-ps-blue text-white shadow-lg" : "text-white/40 hover:text-white"
-                }`}
-              >
-                {p} {p === "1" ? "месяц" : p === "3" ? "месяца" : "месяцев"}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-col items-center justify-center pt-8 gap-6">
           {isAdmin && (
             <Button
               onClick={() => setEditingSubscription({})}
-              className="bg-green-500 hover:bg-green-600 text-white shadow-lg h-12"
+              className="bg-green-500 hover:bg-green-600 text-white shadow-lg h-12 w-full max-w-xs"
             >
               + Добавить план
             </Button>
           )}
+          <div className="bg-ps-navy/50 p-1 rounded-2xl border border-white/5 flex w-full max-w-md">
+            {["1", "3", "12"].map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
+                  period === p ? "bg-ps-blue text-white shadow-lg" : "text-white/40 hover:text-white"
+                }`}
+              >
+                {p} {p === "1" ? "мес." : p === "3" ? "мес." : "мес."}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
