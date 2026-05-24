@@ -123,7 +123,7 @@ function generateSlug(name: string) {
 export async function GET() {
   try {
     // 1. Seed Categories
-    const categoryIds = {};
+    const categoryIds: Record<string, string> = {};
     for (const catName of categories) {
       if (catName === "Все игры") continue;
       const cat = await prisma.category.upsert({
