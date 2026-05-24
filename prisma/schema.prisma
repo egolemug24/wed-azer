@@ -59,8 +59,8 @@ model Product {
   price       Float
   discount    Int      @default(0)
   image       String
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId  String?
   platform    Platform[]
   region      String?
   isAvailable Boolean  @default(true)
@@ -110,3 +110,31 @@ enum OrderStatus {
   CANCELLED
   FAILED
 }
+
+model SubscriptionPlan {
+  id       String   @id @default(cuid())
+  name     String
+  color    String
+  glow     String
+  price1   Float
+  price3   Float
+  price12  Float
+  features String[]
+  popular  Boolean  @default(false)
+  order    Int      @default(0)
+}
+
+model SiteVisitor {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  lastSeen  DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id        String   @id @default("global")
+  rateUah   Float    @default(2.5)
+  rateTry   Float    @default(3.0)
+  updatedAt DateTime @updatedAt
+}
+

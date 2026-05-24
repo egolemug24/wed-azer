@@ -10,6 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/store/use-cart';
 import { useFavorites } from '@/store/use-favorites';
 import { toast } from 'sonner';
+import { useAuth } from '@/store/use-auth';
+import { useAdmin } from '@/store/use-admin';
+import { MoreHorizontal } from 'lucide-react';
 
 interface ProductCardProps {
   product: {
@@ -27,7 +30,10 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const { hasItem, addItem: addFav, removeItem: removeFav } = useFavorites();
+  const { user, isAuthenticated } = useAuth();
+  const { setEditingProduct } = useAdmin();
   const isFavorite = hasItem(product.id);
+  const isAdmin = isAuthenticated && user?.role === 'ADMIN';
   const discountedPrice = product.price * (1 - product.discount / 100);
 
   const toggleFavorite = (e: React.MouseEvent) => {
@@ -90,14 +96,27 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Favorite Button */}
-          <button 
-            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md border border-white/10 transition-all z-10 ${
-              isFavorite ? 'bg-ps-blue/80 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)]' : 'bg-ps-dark/50 text-white/70 hover:text-red-500 hover:scale-110'
-            }`}
-            onClick={toggleFavorite}
-          >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-white' : ''}`} />
-          </button>
+          <div className="absolute top-3 right-3 flex flex-col gap-2 z-10">
+            {isAdmin && (
+              <button
+                className="p-2 rounded-full backdrop-blur-md border border-white/10 bg-ps-dark/80 text-white hover:text-ps-blue hover:scale-110 transition-all"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEditingProduct(product);
+                }}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+            )}
+            <button 
+              className={`p-2 rounded-full backdrop-blur-md border border-white/10 transition-all ${
+                isFavorite ? 'bg-ps-blue/80 text-white shadow-[0_0_15px_rgba(37,99,235,0.8)]' : 'bg-ps-dark/50 text-white/70 hover:text-red-500 hover:scale-110'
+              }`}
+              onClick={toggleFavorite}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-white' : ''}`} />
+            </button>
+          </div>
 
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-ps-blue/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">

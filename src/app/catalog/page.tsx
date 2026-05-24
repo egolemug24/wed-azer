@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProductCard } from '@/components/common/ProductCard';
-import { PRODUCTS } from '@/lib/mock-data';
 import { 
   Search, 
   Filter, 
   SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  Plus
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,21 +20,52 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-
-const categories = [
-  "Все игры", "Экшен", "RPG", "Спорт", "Приключения", "Хоррор", "Симуляторы"
-];
-
-const platforms = ["PS4", "PS5"];
+import { CategoriesModal } from '@/components/admin/CategoriesModal';
+import { useAuth } from '@/store/use-auth';
+import { useAdmin } from '@/store/use-admin';
 
 export default function CatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState("Все игры");
+  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>(["Все игры"]);
+  const [loading, setLoading] = useState(true);
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
 
-  const filteredProducts = PRODUCTS.filter(p => {
+  const { isAuthenticated, user } = useAuth();
+  const { setEditingProduct } = useAdmin();
+  const isAdmin = isAuthenticated && user?.role === 'ADMIN';
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [prodRes, catRes] = await Promise.all([
+          fetch('/api/products'),
+          fetch('/api/categories')
+        ]);
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          setProducts(data);
+        }
+        if (catRes.ok) {
+          const cats = await catRes.json();
+          setCategories(["Все игры", ...cats.map((c: any) => c.name)]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory === "Все игры" || p.category === selectedCategory;
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesPlatform = selectedPlatform ? p.platforms?.includes(selectedPlatform) : true;
+    return matchesCategory && matchesSearch && matchesPlatform;
   });
 
   return (
@@ -44,9 +75,20 @@ export default function CatalogPage() {
         {/* Sidebar Filters */}
         <aside className="w-full lg:w-64 shrink-0 space-y-8">
           <div className="glass-card p-6 rounded-2xl border border-white/5">
-            <h3 className="font-bold mb-6 flex items-center gap-2">
-              <Filter className="w-4 h-4 text-ps-blue" />
-              Категории
+            <h3 className="font-bold mb-6 flex items-center gap-2 justify-between">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-ps-blue" />
+                Категории
+              </div>
+              {isAdmin && (
+                <button
+                  onClick={() => setIsCategoriesModalOpen(true)}
+                  className="p-1.5 rounded-md hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
+                  title="Управление категориями"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              )}
             </h3>
             <div className="space-y-2">
               {categories.map(cat => (
@@ -71,8 +113,13 @@ export default function CatalogPage() {
               Платформа
             </h3>
             <div className="flex gap-2">
-              {platforms.map(p => (
-                <Badge key={p} variant="outline" className="cursor-pointer hover:border-ps-blue transition-colors px-4 py-1">
+              {['PS4', 'PS5'].map(p => (
+                <Badge 
+                  key={p} 
+                  variant={selectedPlatform === p ? "default" : "outline"} 
+                  className={`cursor-pointer transition-colors px-4 py-1 ${selectedPlatform === p ? 'bg-ps-blue text-white' : 'hover:border-ps-blue'}`}
+                  onClick={() => setSelectedPlatform(prev => prev === p ? null : p)}
+                >
                   {p}
                 </Badge>
               ))}
@@ -82,7 +129,7 @@ export default function CatalogPage() {
           <div className="glass-card p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-ps-blue/10 to-transparent">
              <h4 className="font-bold text-sm mb-2">Нужна помощь?</h4>
              <p className="text-xs text-muted-foreground mb-4">Не можете найти игру или возникли вопросы по оплате?</p>
-             <Button className="w-full bg-ps-blue hover:bg-ps-glow h-9 text-xs">
+             <Button className="w-full bg-ps-blue hover:bg-ps-glow h-9 text-xs" onClick={() => window.open('https://t.me/Elvin4ik99', '_blank')}>
                Написать в Telegram
              </Button>
           </div>
@@ -122,15 +169,47 @@ export default function CatalogPage() {
           </div>
 
           {/* Results Info */}
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold">{selectedCategory}</h2>
-            <span className="text-xs text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full">
-              {filteredProducts.length} товаров
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">{selectedCategory}</h2>
+              <span className="text-xs text-muted-foreground bg-white/5 px-2 py-0.5 rounded-full">
+                {filteredProducts.length} товаров
+              </span>
+              {selectedPlatform && (
+                <Badge className="ml-2 bg-ps-blue/20 text-ps-blue hover:bg-ps-blue/30 border-none">
+                  Только {selectedPlatform}
+                </Badge>
+              )}
+            </div>
+            
+            {isAdmin && (
+              <Button 
+                onClick={() => setEditingProduct({
+                  id: '',
+                  name: '',
+                  description: '',
+                  price: 0,
+                  discount: 0,
+                  image: '',
+                  categoryId: '',
+                  platform: ['PS5'],
+                  isNew: true
+                })}
+                className="bg-green-600 hover:bg-green-500 text-white font-bold h-9"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Добавить игру
+              </Button>
+            )}
           </div>
 
           {/* Grid */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="py-20 text-center glass-card rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center space-y-4">
+              <div className="w-8 h-8 border-4 border-ps-blue border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-muted-foreground">Загрузка товаров...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
@@ -160,8 +239,13 @@ export default function CatalogPage() {
           )}
         </main>
       </div>
+
+      <CategoriesModal 
+        isOpen={isCategoriesModalOpen} 
+        onClose={() => setIsCategoriesModalOpen(false)} 
+      />
     </div>
   );
 }
 
-import { Gamepad2 } from 'lucide-react';
+import { Gamepad2, Settings } from 'lucide-react';

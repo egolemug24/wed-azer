@@ -10,53 +10,49 @@ import { useCart } from '@/store/use-cart';
 import { useFavorites } from '@/store/use-favorites';
 import { toast } from 'sonner';
 
-const plans = [
-  {
-    name: "Essential",
-    color: "bg-zinc-500",
-    glow: "shadow-[0_0_20px_rgba(113,113,122,0.3)]",
-    price: { "1": "690", "3": "1690", "12": "4290" },
-    features: [
-      "Ежемесячные игры",
-      "Сетевая игра",
-      "Эксклюзивные скидки",
-      "Облачное хранилище"
-    ]
-  },
-  {
-    name: "Extra",
-    color: "bg-yellow-500",
-    glow: "shadow-[0_0_20px_rgba(234,179,8,0.3)]",
-    price: { "1": "990", "3": "2490", "12": "6490" },
-    features: [
-      "Все из Essential",
-      "Каталог игр (400+ игр)",
-      "Ubisoft+ Classics"
-    ],
-    popular: true
-  },
-  {
-    name: "Deluxe",
-    color: "bg-ps-blue",
-    glow: "shadow-[0_0_20px_rgba(37,99,235,0.4)]",
-    price: { "1": "1290", "3": "3290", "12": "7490" },
-    features: [
-      "Все из Extra",
-      "Каталог классики",
-      "Пробные версии игр"
-    ]
-  }
-];
+import { useAuth } from '@/store/use-auth';
+import { useAdmin } from '@/store/use-admin';
+import { MoreHorizontal, Loader2 } from 'lucide-react';
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  color: string;
+  glow: string;
+  price1: number;
+  price3: number;
+  price12: number;
+  features: string[];
+  popular: boolean;
+}
 
 export default function SubscriptionsPage() {
   const [period, setPeriod] = useState("12");
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [loading, setLoading] = useState(true);
   const { addItem: addToCart } = useCart();
   const { hasItem, addItem: addFav, removeItem: removeFav } = useFavorites();
+  const { user, isAuthenticated } = useAuth();
+  const { setEditingSubscription } = useAdmin();
+  const isAdmin = isAuthenticated && user?.role === 'ADMIN';
 
-  const getPlanId = (plan: any) => `psplus-${plan.name.toLowerCase()}-${period}`;
+  React.useEffect(() => {
+    fetch('/api/subscriptions')
+      .then(res => res.json())
+      .then(data => {
+        if (data.plans) setPlans(data.plans);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  const getPlanId = (plan: SubscriptionPlan) => `psplus-${plan.name.toLowerCase()}-${period}`;
   
-  const handleAddToCart = (plan: any) => {
-    const price = parseInt(plan.price[period as keyof typeof plan.price]);
+  const handleAddToCart = (plan: SubscriptionPlan) => {
+    const price = period === "1" ? plan.price1 : period === "3" ? plan.price3 : plan.price12;
     addToCart({
       id: getPlanId(plan),
       name: `PS Plus ${plan.name} (${period} мес.)`,
@@ -68,9 +64,9 @@ export default function SubscriptionsPage() {
     toast.success(`Подписка ${plan.name} добавлена в корзину`);
   };
 
-  const toggleFavorite = (plan: any) => {
+  const toggleFavorite = (plan: SubscriptionPlan) => {
     const id = getPlanId(plan);
-    const price = parseInt(plan.price[period as keyof typeof plan.price]);
+    const price = period === "1" ? plan.price1 : period === "3" ? plan.price3 : plan.price12;
     if (hasItem(id)) {
       removeFav(id);
       toast.success("Удалено из избранного");
@@ -95,7 +91,7 @@ export default function SubscriptionsPage() {
           Сотни игр, эксклюзивные скидки и сетевая игра. Активация на ваш турецкий аккаунт за 15 минут.
         </p>
         
-        <div className="flex items-center justify-center pt-8">
+        <div className="flex items-center justify-center pt-8 gap-4">
           <div className="bg-ps-navy/50 p-1 rounded-2xl border border-white/5 flex">
             {["1", "3", "12"].map((p) => (
               <button
@@ -109,11 +105,23 @@ export default function SubscriptionsPage() {
               </button>
             ))}
           </div>
+          {isAdmin && (
+            <Button
+              onClick={() => setEditingSubscription({})}
+              className="bg-green-500 hover:bg-green-600 text-white shadow-lg h-12"
+            >
+              + Добавить план
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {plans.map((plan, i) => (
+        {loading ? (
+          <div className="col-span-3 flex justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-ps-blue" />
+          </div>
+        ) : plans.map((plan, i) => (
           <motion.div
             key={plan.name}
             initial={{ opacity: 0, y: 20 }}
@@ -123,6 +131,18 @@ export default function SubscriptionsPage() {
               plan.popular ? "border-ps-blue shadow-[0_0_40px_rgba(37,99,235,0.1)] scale-105 z-10" : "border-white/5"
             }`}
           >
+            {isAdmin && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setEditingSubscription(plan);
+                }}
+                className="absolute top-4 right-4 p-2 z-20 rounded-full bg-ps-dark/80 border border-white/10 hover:text-ps-blue transition-all"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+            )}
+
             {plan.popular && (
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-ps-blue text-white text-[10px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-lg">
                 Рекомендуем
@@ -138,7 +158,9 @@ export default function SubscriptionsPage() {
 
             <div className="mb-8">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black">{plan.price[period as keyof typeof plan.price]} ₽</span>
+                <span className="text-4xl font-black">
+                  {(period === "1" ? plan.price1 : period === "3" ? plan.price3 : plan.price12).toLocaleString()} ₽
+                </span>
                 <span className="text-muted-foreground text-sm">/ {period === "1" ? "мес" : period === "3" ? "3 мес" : "год"}</span>
               </div>
               {period === "12" && (

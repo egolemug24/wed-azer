@@ -14,7 +14,9 @@ import {
   PlusCircle,
   Gamepad2,
   RefreshCcw,
-  Loader2
+  Loader2,
+  BarChart3,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,8 +63,11 @@ export default function ProfilePage() {
   const { logout } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'transactions'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'transactions' | 'analytics'>('orders');
   const [topupLoading, setTopupLoading] = useState(false);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [settings, setSettings] = useState<any>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const fetchProfile = async () => {
     try {
@@ -74,11 +79,56 @@ export default function ProfilePage() {
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
+        if (data.user.role === 'ADMIN') {
+          fetchAnalytics();
+          fetchSettings();
+        }
       }
     } catch (err) {
       console.error('Failed to fetch profile', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      const res = await fetch('/api/admin/analytics');
+      if (res.ok) {
+        const data = await res.json();
+        setAnalytics(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch analytics', err);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      if (res.ok) setSettings(await res.json());
+    } catch (err) {
+      console.error('Failed to fetch settings', err);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    if (!settings) return;
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rateUah: settings.rateUah, rateTry: settings.rateTry })
+      });
+      if (res.ok) {
+        alert('Настройки сохранены');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Ошибка при сохранении');
+    } finally {
+      setSavingSettings(false);
     }
   };
 
@@ -179,6 +229,17 @@ export default function ProfilePage() {
               <Wallet className="w-5 h-5" />
               История пополнений
             </button>
+            {user.role === 'ADMIN' && (
+              <button
+                onClick={() => setActiveTab('analytics')}
+                className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-all hover:bg-white/5 ${
+                  activeTab === 'analytics' ? "bg-ps-blue/10 text-ps-blue border-r-2 border-ps-blue" : "text-white/60"
+                }`}
+              >
+                <BarChart3 className="w-5 h-5" />
+                Панель управления
+              </button>
+            )}
             <button 
               onClick={() => { logout(); router.push('/'); }} 
               className="w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-all hover:bg-white/5 text-red-500"
@@ -212,11 +273,84 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">
-                {activeTab === 'orders' ? 'История покупок' : 'История пополнений'}
+                {activeTab === 'orders' ? 'История покупок' : activeTab === 'transactions' ? 'История пополнений' : 'Аналитика сайта'}
               </h2>
             </div>
 
             <div className="space-y-4">
+              {activeTab === 'analytics' && analytics && (
+                <div className="space-y-8">
+                  {settings && (
+                    <div className="glass-card p-6 rounded-2xl border border-white/5 space-y-4">
+                      <h3 className="font-bold text-lg">Курсы валют</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-white/70 uppercase">Курс Гривны (UAH к RUB)</label>
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            value={settings.rateUah}
+                            onChange={(e) => setSettings({...settings, rateUah: Number(e.target.value)})}
+                            className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-md focus:ring-2 focus:ring-ps-blue"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-bold text-white/70 uppercase">Курс Лиры (TRY к RUB)</label>
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            value={settings.rateTry}
+                            onChange={(e) => setSettings({...settings, rateTry: Number(e.target.value)})}
+                            className="w-full h-10 px-3 bg-white/5 border border-white/10 rounded-md focus:ring-2 focus:ring-ps-blue"
+                          />
+                        </div>
+                      </div>
+                      <Button onClick={handleSaveSettings} disabled={savingSettings} className="bg-ps-blue hover:bg-ps-glow mt-2">
+                        {savingSettings ? 'Сохранение...' : 'Сохранить курсы'}
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="glass-card p-6 rounded-2xl border border-ps-blue/30 bg-ps-blue/5">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Users className="text-ps-blue w-6 h-6" />
+                        <h3 className="font-bold text-lg text-white">Прямо сейчас на сайте</h3>
+                      </div>
+                      <p className="text-5xl font-black text-glow text-ps-blue">{analytics.onlineCount}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="glass-card p-6 rounded-2xl border border-white/5">
+                      <h4 className="text-white/50 text-sm font-bold uppercase mb-4">Продажи (товаров)</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between"><span>За день:</span> <span className="font-bold">{analytics.sales.day}</span></div>
+                        <div className="flex justify-between"><span>За неделю:</span> <span className="font-bold">{analytics.sales.week}</span></div>
+                        <div className="flex justify-between"><span>За месяц:</span> <span className="font-bold">{analytics.sales.month}</span></div>
+                      </div>
+                    </div>
+                    
+                    <div className="glass-card p-6 rounded-2xl border border-white/5">
+                      <h4 className="text-white/50 text-sm font-bold uppercase mb-4">Выручка</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-green-400"><span>За день:</span> <span className="font-bold">{analytics.revenue.day.toLocaleString()} ₽</span></div>
+                        <div className="flex justify-between text-green-400"><span>За неделю:</span> <span className="font-bold">{analytics.revenue.week.toLocaleString()} ₽</span></div>
+                        <div className="flex justify-between text-green-400"><span>За месяц:</span> <span className="font-bold">{analytics.revenue.month.toLocaleString()} ₽</span></div>
+                      </div>
+                    </div>
+                    
+                    <div className="glass-card p-6 rounded-2xl border border-white/5">
+                      <h4 className="text-white/50 text-sm font-bold uppercase mb-4">Посетители (сессии)</h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between"><span>За день:</span> <span className="font-bold">{analytics.visitors.day}</span></div>
+                        <div className="flex justify-between"><span>За неделю:</span> <span className="font-bold">{analytics.visitors.week}</span></div>
+                        <div className="flex justify-between"><span>За месяц:</span> <span className="font-bold">{analytics.visitors.month}</span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               {activeTab === 'orders' && user.orders.length === 0 && (
                 <div className="text-center py-10 text-white/50">У вас еще нет покупок</div>
               )}

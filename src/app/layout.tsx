@@ -6,6 +6,9 @@ import { Footer } from "@/components/layout/Footer";
 import QueryProvider from "@/lib/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { ProductModal } from "@/components/admin/ProductModal";
+import { SubscriptionModal } from "@/components/admin/SubscriptionModal";
+import { AnalyticsProvider } from "@/components/providers/AnalyticsProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -48,6 +51,9 @@ export default function RootLayout({
           </div>
           <Toaster position="bottom-right" richColors />
           <AuthModal />
+          <ProductModal />
+          <SubscriptionModal />
+          <AnalyticsProvider />
         </QueryProvider>
       </body>
     </html>

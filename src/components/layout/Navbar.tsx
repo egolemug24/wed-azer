@@ -32,7 +32,6 @@ const navLinks = [
   { name: 'Игры', href: '/catalog', icon: Gamepad2 },
   { name: 'Подписки', href: '/subscriptions', icon: PlusCircle },
   { name: 'Пополнение', href: '/top-up', icon: Wallet },
-  { name: 'Популярное', href: '/popular', icon: Heart },
 ];
 
 export function Navbar() {
@@ -74,7 +73,7 @@ export function Navbar() {
             <Gamepad2 className="text-white w-6 h-6" />
           </div>
           <span className="text-xl font-bold tracking-tight hidden sm:block">
-            PxM_<span className="text-ps-blue">GamerPlus</span>
+            ElStore-<span className="text-ps-blue">PlayStation</span>
           </span>
         </Link>
 
@@ -163,7 +162,7 @@ export function Navbar() {
                   <div className="w-8 h-8 bg-ps-blue rounded-lg flex items-center justify-center">
                     <Gamepad2 className="text-white w-5 h-5" />
                   </div>
-                  <span>GamerPlus</span>
+                  <span>ElStore-PlayStation</span>
                 </SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-2">

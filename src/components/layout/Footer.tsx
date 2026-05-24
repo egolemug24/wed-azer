@@ -21,7 +21,7 @@ export function Footer() {
               <Gamepad2 className="text-white w-6 h-6" />
             </div>
             <span className="text-xl font-bold tracking-tight">
-              PxM_<span className="text-ps-blue">GamerPlus</span>
+              ElStore-<span className="text-ps-blue">PlayStation</span>
             </span>
           </Link>
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
@@ -48,8 +48,6 @@ export function Footer() {
             <li><Link href="/catalog" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Игры PS4 / PS5</Link></li>
             <li><Link href="/subscriptions" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Подписки PS Plus</Link></li>
             <li><Link href="/top-up" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Пополнение кошелька</Link></li>
-            <li><Link href="/ea-play" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">EA Play / Deluxe</Link></li>
-            <li><Link href="/physical" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Физические товары</Link></li>
           </ul>
         </div>
 
@@ -59,9 +57,6 @@ export function Footer() {
           <ul className="space-y-4">
             <li><Link href="/faq" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Как купить?</Link></li>
             <li><Link href="/guarantee" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Гарантии</Link></li>
-            <li><Link href="/contacts" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Контакты</Link></li>
-            <li><Link href="/privacy" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Политика конфиденциальности</Link></li>
-            <li><Link href="/terms" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Публичная оферта</Link></li>
           </ul>
         </div>
 
@@ -93,7 +88,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-xs text-muted-foreground">
-          © 2024 PxM_GamerPlus. Все права защищены. PlayStation, PS5, PS4 являются товарными знаками Sony Interactive Entertainment Inc.
+          © 2024 ElStore-PlayStation. Все права защищены. PlayStation, PS5, PS4 являются товарными знаками Sony Interactive Entertainment Inc.
         </p>
         <div className="flex items-center gap-6 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
           <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />

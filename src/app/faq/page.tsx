@@ -60,7 +60,10 @@ export default function FAQPage() {
       <div className="mt-16 text-center space-y-6">
         <h3 className="text-xl font-bold">Остались вопросы?</h3>
         <p className="text-muted-foreground">Наши операторы на связи и готовы помочь вам в Telegram.</p>
-        <Button className="bg-ps-blue hover:bg-ps-glow px-12 h-14 text-lg font-bold shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+        <Button 
+          className="bg-ps-blue hover:bg-ps-glow px-12 h-14 text-lg font-bold shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+          onClick={() => window.open('https://t.me/Elvin4ik99', '_blank')}
+        >
           <Send className="w-5 h-5 mr-2" /> Написать оператору
         </Button>
       </div>
