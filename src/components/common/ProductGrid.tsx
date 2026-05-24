@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ProductCard } from '@/components/common/ProductCard';
 import { PRODUCTS } from '@/lib/mock-data';
+import Link from 'next/link';
 
 interface ProductGridProps {
   title?: string;
@@ -36,9 +37,9 @@ export function ProductGrid({ title, limit }: ProductGridProps) {
             <span className="w-2 h-8 bg-ps-blue rounded-full" />
             {title}
           </h2>
-          <button className="text-ps-blue hover:text-ps-glow font-medium text-sm transition-colors">
+          <Link href="/catalog" className="text-ps-blue hover:text-ps-glow font-medium text-sm transition-colors shrink-0">
             Смотреть все →
-          </button>
+          </Link>
         </div>
       )}
 
