@@ -106,7 +106,7 @@ const mockSubscriptions = [
   }
 ];
 
-function generateSlug(name) {
+function generateSlug(name: string) {
   const ru = {
     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 
     'е': 'e', 'ё': 'e', 'ж': 'zh', 'з': 'z', 'и': 'i', 
@@ -116,7 +116,8 @@ function generateSlug(name) {
     'щ': 'sch', 'ы': 'y', 'э': 'e', 'ю': 'yu', 'я': 'ya',
     ' ': '-', 'В': 'v', 'Э': 'e', 'С': 's', 'Р': 'r'
   };
-  return name.toLowerCase().split('').map(char => ru[char] || char).join('').replace(/[^a-z0-9-]/g, '');
+    const charObj: Record<string, string> = ru;
+    return name.toLowerCase().split('').map(char => charObj[char] || char).join('').replace(/[^a-z0-9-]/g, '');
 }
 
 export async function GET() {
