@@ -177,12 +177,29 @@ export function Navbar() {
                   </Link>
                 ))}
                 <div className="mt-8 pt-8 border-t border-white/10">
-                  <Link href="/profile" className="w-full">
-                    <Button className="w-full bg-ps-blue h-12 text-lg">
+                  {isAuthenticated ? (
+                    <div className="flex flex-col gap-3">
+                      <Link href="/profile" className="w-full">
+                        <Button className="w-full bg-ps-blue h-12 text-lg">
+                          <User className="w-5 h-5 mr-3" />
+                          Личный кабинет
+                        </Button>
+                      </Link>
+                      <Button onClick={logout} variant="outline" className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 h-12 text-lg">
+                        Выйти
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button 
+                      onClick={() => {
+                        openAuthModal();
+                      }} 
+                      className="w-full bg-ps-blue h-12 text-lg"
+                    >
                       <User className="w-5 h-5 mr-3" />
-                      Личный кабинет
+                      Войти
                     </Button>
-                  </Link>
+                  )}
                 </div>
               </div>
             </SheetContent>
