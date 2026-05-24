@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/store/use-auth';
 
 type Transaction = {
   id: string;
@@ -57,6 +58,7 @@ type UserProfile = {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { logout } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'orders' | 'transactions'>('orders');
@@ -177,7 +179,10 @@ export default function ProfilePage() {
               <Wallet className="w-5 h-5" />
               История пополнений
             </button>
-            <button className="w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-all hover:bg-white/5 text-red-500">
+            <button 
+              onClick={() => { logout(); router.push('/'); }} 
+              className="w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-all hover:bg-white/5 text-red-500"
+            >
               <LogOut className="w-5 h-5" />
               Выйти
             </button>

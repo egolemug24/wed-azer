@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
   Gamepad2, 
   ShoppingCart, 
@@ -37,7 +37,9 @@ const navLinks = [
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { items: cartItems } = useCart();
   const { items: favoriteItems } = useFavorites();
   const { user, isAuthenticated, openAuthModal, logout, checkSession } = useAuth();
@@ -137,7 +139,7 @@ export function Navbar() {
               <Link href="/profile" className="text-sm font-medium hover:text-ps-blue transition-colors cursor-pointer">
                 {user?.name || user?.email}
               </Link>
-              <Button onClick={logout} variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-400/10">
+              <Button onClick={() => { logout(); router.push('/'); }} variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-400/10">
                 Выйти
               </Button>
             </div>
@@ -149,8 +151,8 @@ export function Navbar() {
           )}
 
           {/* Mobile Menu */}
-          <Sheet>
-            <SheetTrigger>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden rounded-full">
                 <Menu className="w-6 h-6" />
               </Button>
@@ -166,7 +168,7 @@ export function Navbar() {
               </SheetHeader>
               <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
-                  <Link key={link.href} href={link.href} className="w-full">
+                  <Link key={link.href} href={link.href} className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
                       className="w-full justify-start text-lg h-12"
@@ -179,19 +181,20 @@ export function Navbar() {
                 <div className="mt-8 pt-8 border-t border-white/10">
                   {isAuthenticated ? (
                     <div className="flex flex-col gap-3">
-                      <Link href="/profile" className="w-full">
+                      <Link href="/profile" className="w-full" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button className="w-full bg-ps-blue h-12 text-lg">
                           <User className="w-5 h-5 mr-3" />
                           Личный кабинет
                         </Button>
                       </Link>
-                      <Button onClick={logout} variant="outline" className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 h-12 text-lg">
+                      <Button onClick={() => { setIsMobileMenuOpen(false); logout(); router.push('/'); }} variant="outline" className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 h-12 text-lg">
                         Выйти
                       </Button>
                     </div>
                   ) : (
                     <Button 
                       onClick={() => {
+                        setIsMobileMenuOpen(false);
                         openAuthModal();
                       }} 
                       className="w-full bg-ps-blue h-12 text-lg"
