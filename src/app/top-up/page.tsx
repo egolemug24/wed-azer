@@ -19,8 +19,32 @@ const topUpOptions = [
 export default function TopUpPage() {
   const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
   const [customAmount, setCustomAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const finalAmount = selectedAmount || Number(customAmount) || 0;
+
+  const handlePayment = async () => {
+    if (finalAmount <= 0) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: finalAmount })
+      });
+      const data = await res.json();
+      
+      if (data.url) {
+        window.location.href = data.url; // Перенаправляем на кассу
+      } else {
+        alert(data.error || 'Ошибка создания платежа');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      alert('Ошибка соединения с сервером');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen pt-10 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
@@ -123,10 +147,11 @@ export default function TopUpPage() {
               </div>
 
               <Button 
-                disabled={finalAmount <= 0}
+                onClick={handlePayment}
+                disabled={finalAmount <= 0 || isLoading}
                 className="w-full bg-ps-blue hover:bg-ps-glow h-14 text-lg font-bold shadow-[0_0_20px_rgba(37,99,235,0.4)]"
               >
-                Оплатить {finalAmount.toLocaleString()} ₽
+                {isLoading ? 'Перенаправление...' : `Оплатить ${finalAmount.toLocaleString()} ₽`}
               </Button>
 
               <div className="flex flex-col gap-4 pt-6">
