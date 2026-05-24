@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role         @default(USER)
+  balance       Float        @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  orders        Order[]
+  favorites     Product[]    @relation("UserFavorites")
+  transactions  Transaction[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Transaction {
+  id        String            @id @default(cuid())
+  userId    String
+  user      User              @relation(fields: [userId], references: [id])
+  amount    Float
+  type      TransactionType
+  status    TransactionStatus @default(COMPLETED)
+  createdAt DateTime          @default(now())
+}
+
+enum TransactionType {
+  TOPUP
+  PURCHASE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  discount    Int      @default(0)
+  image       String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  platform    Platform[]
+  region      String?
+  isAvailable Boolean  @default(true)
+  rating      Float    @default(5.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  favoritedBy User[]   @relation("UserFavorites")
+  orderItems  OrderItem[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  products Product[]
+}
+
+enum Platform {
+  PS4
+  PS5
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  total     Float
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  FAILED
+}
