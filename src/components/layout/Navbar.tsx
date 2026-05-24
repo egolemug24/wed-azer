@@ -156,7 +156,7 @@ export function Navbar() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-ps-dark border-white/10 w-[300px]">
+            <SheetContent side="right" className="bg-ps-dark border-white/10 w-[300px] overflow-y-auto">
               <SheetHeader>
                 <SheetTitle className="text-left flex items-center gap-2 mb-8">
                   <div className="w-8 h-8 bg-ps-blue rounded-lg flex items-center justify-center">
