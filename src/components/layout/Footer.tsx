@@ -32,7 +32,7 @@ export function Footer() {
             <a href="https://t.me/Elvin4ik99" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
               <Send className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
             </a>
-            <a href="https://vk.ru/stargamer_playstation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
+            <a href="https://vk.com/elstore_playstation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
               <VkIcon className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
             </a>
             <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
