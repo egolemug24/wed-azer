@@ -32,6 +32,7 @@ export default function CatalogPage() {
   const [categories, setCategories] = useState<string[]>(["Все игры"]);
   const [loading, setLoading] = useState(true);
   const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const { isAuthenticated, user } = useAuth();
   const { setEditingProduct } = useAdmin();
@@ -60,6 +61,11 @@ export default function CatalogPage() {
     }
     fetchData();
   }, []);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [selectedCategory, selectedPlatform, searchQuery]);
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = selectedCategory === "Все игры" || p.category === selectedCategory;
@@ -211,7 +217,7 @@ export default function CatalogPage() {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map(product => (
+              {filteredProducts.slice(0, visibleCount).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -230,9 +236,13 @@ export default function CatalogPage() {
           )}
           
           {/* Pagination/Load More */}
-          {filteredProducts.length > 0 && (
+          {visibleCount < filteredProducts.length && (
             <div className="flex justify-center pt-10">
-              <Button variant="outline" className="border-ps-blue/30 text-ps-blue hover:bg-ps-blue hover:text-white px-12 h-12">
+              <Button 
+                onClick={() => setVisibleCount(prev => prev + 12)}
+                variant="outline" 
+                className="border-ps-blue/30 text-ps-blue hover:bg-ps-blue hover:text-white px-12 h-12"
+              >
                 Загрузить еще
               </Button>
             </div>
