@@ -25,14 +25,16 @@ export function SubscriptionModal() {
         price12: editingSubscription.price12 || 0,
         features: editingSubscription.features ? editingSubscription.features.join('\n') : '',
         popular: editingSubscription.popular || false,
-        order: editingSubscription.order || 0
+        order: editingSubscription.order || 0,
+        region: editingSubscription.region || 'TR',
+        type: editingSubscription.type || 'PS_PLUS'
       });
     }
   }, [editingSubscription]);
 
   if (!editingSubscription || !formData) return null;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
     if (type === 'checkbox') {
@@ -103,15 +105,15 @@ export function SubscriptionModal() {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-xs text-white/50 uppercase font-bold">Цена 1 мес (₽)</label>
+                <label className="text-xs text-white/50 uppercase font-bold">Цена 1м / PS4 (₽)</label>
                 <Input type="number" name="price1" value={formData.price1} onChange={handleChange} className="bg-white/5 border-white/10" required />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-white/50 uppercase font-bold">Цена 3 мес (₽)</label>
+                <label className="text-xs text-white/50 uppercase font-bold">Цена 3м / PS5 (₽)</label>
                 <Input type="number" name="price3" value={formData.price3} onChange={handleChange} className="bg-white/5 border-white/10" required />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-white/50 uppercase font-bold">Цена 1 год (₽)</label>
+                <label className="text-xs text-white/50 uppercase font-bold">Цена 1г / N/A (₽)</label>
                 <Input type="number" name="price12" value={formData.price12} onChange={handleChange} className="bg-white/5 border-white/10" required />
               </div>
             </div>
@@ -135,6 +137,35 @@ export function SubscriptionModal() {
               <div className="space-y-1">
                 <label className="text-xs text-white/50 uppercase font-bold">Свечение (класс Tailwind)</label>
                 <Input name="glow" value={formData.glow} onChange={handleChange} className="bg-white/5 border-white/10 text-xs" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs text-white/50 uppercase font-bold">Регион</label>
+                <select
+                  name="region"
+                  value={formData.region}
+                  onChange={handleChange}
+                  className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white p-2 text-sm focus:outline-none focus:ring-1 focus:ring-ps-blue"
+                >
+                  <option value="TR">Турция (TR)</option>
+                  <option value="UA">Украина (UA)</option>
+                  <option value="ALL">Все / Шеринг (ALL)</option>
+                </select>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-white/50 uppercase font-bold">Тип подписки</label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white p-2 text-sm focus:outline-none focus:ring-1 focus:ring-ps-blue"
+                >
+                  <option value="PS_PLUS">PlayStation Plus</option>
+                  <option value="EA_PLAY">EA Play</option>
+                  <option value="P3_SHARING">П3 Шеринг</option>
+                </select>
               </div>
             </div>
             

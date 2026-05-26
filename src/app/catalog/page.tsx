@@ -23,11 +23,154 @@ import { Separator } from '@/components/ui/separator';
 import { CategoriesModal } from '@/components/admin/CategoriesModal';
 import { useAuth } from '@/store/use-auth';
 import { useAdmin } from '@/store/use-admin';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-export default function CatalogPage() {
+// Smart Search function with layout transliteration and game aliases
+function smartSearch(products: any[], query: string) {
+  if (!query) return products;
+  
+  const cleanQuery = query.toLowerCase().trim();
+  const queryWords = cleanQuery.split(/\s+/).filter(w => w.length > 0);
+  if (queryWords.length === 0) return products;
+
+  // Common aliases for games to bridge English/Russian naming gaps
+  const aliases: { [key: string]: string[] } = {
+    'spider-man': ['человек-паук', 'паук', 'человек паук', 'spiderman', 'spider'],
+    'spider': ['spider-man', 'человек-паук', 'паук', 'человек паук', 'spiderman'],
+    'spiderman': ['spider-man', 'человек-паук', 'паук', 'человек паук'],
+    'человек-паук': ['spider-man', 'паук', 'spiderman', 'spider'],
+    'человек паук': ['spider-man', 'паук', 'spiderman', 'spider'],
+    'паук': ['spider-man', 'spiderman', 'человек-паук', 'spider'],
+    'witcher': ['ведьмак', 'w3', 'дикая охота'],
+    'ведьмак': ['witcher', 'w3', 'дикая охота'],
+    'god of war': ['бог войны', 'кратос', 'gow', 'рагнарек', 'рагнарёк', 'ragnarok'],
+    'бог войны': ['god of war', 'кратос', 'gow', 'ragnarok'],
+    'gow': ['god of war', 'бог войны', 'кратос', 'ragnarok', 'рагнарек', 'рагнарёк'],
+    'elden': ['элден', 'елден', 'кольцо'],
+    'элден': ['elden', 'кольцо'],
+    'елден': ['elden', 'кольцо'],
+    'fc': ['fifa', 'фифа', 'футбол', 'football', 'soccer', 'ea sports'],
+    'fifa': ['fc', 'фифа', 'футбол', 'football'],
+    'фифа': ['fc', 'fifa', 'футбол'],
+    'футбол': ['fc', 'fifa', 'ea sports', 'football'],
+    'gta': ['grand theft auto', 'гта'],
+    'гта': ['gta', 'grand theft auto'],
+    'rdr': ['red dead redemption', 'рдр'],
+    'рдр': ['rdr', 'red dead redemption'],
+    'cyberpunk': ['киберпанк', '2077'],
+    'киберпанк': ['cyberpunk', '2077'],
+    'хоррор': ['horror', 'ужасы', 'resident evil', 'silent hill', 'outlast'],
+    'гонки': ['racing', 'cars', 'need for speed', 'nfs', 'crew', 'motogp'],
+    'спорт': ['sports', 'fc', 'fifa', 'ufc', 'nba', 'nhl'],
+  };
+
+  // Keyboard layout translation helper (Qwerty <-> Йцукен)
+  const keyboardMap: { [key: string]: string } = {
+    'q':'й', 'w':'ц', 'e':'у', 'r':'к', 't':'е', 'y':'н', 'u':'г', 'i':'ш', 'o':'щ', 'p':'з', '[':'х', ']':'ъ',
+    'a':'ф', 's':'ы', 'd':'в', 'f':'а', 'g':'п', 'h':'р', 'j':'о', 'k':'л', 'l':'д', ';':'ж', "'":'э',
+    'z':'я', 'x':'ч', 'c':'с', 'v':'м', 'b':'и', 'n':'т', 'm':'ь', ',':'б', '.':'ю',
+    'й':'q', 'ц':'w', 'у':'e', 'к':'r', 'е':'t', 'н':'y', 'г':'u', 'ш':'i', 'щ':'o', 'з':'p', 'х':'[', 'ъ':']',
+    'ф':'a', 'ы':'s', 'в':'d', 'а':'f', 'п':'g', 'р':'h', 'о':'j', 'л':'k', 'д':'l', 'ж':';', 'э':"'",
+    'я':'z', 'ч':'x', 'с':'c', 'м':'v', 'и':'b', 'т':'n', 'ь':'m', 'б':',', 'ю':'.'
+  };
+
+  const translateLayout = (text: string) => {
+    return text.split('').map(char => keyboardMap[char] || char).join('');
+  };
+
+  const translatedQuery = translateLayout(cleanQuery);
+  const translatedQueryWords = translatedQuery.split(/\s+/).filter(w => w.length > 0);
+
+  // Score each product
+  const scored = products.map(p => {
+    let score = 0;
+    const name = p.name.toLowerCase();
+    const desc = (p.description || "").toLowerCase();
+    const cat = (p.category || "").toLowerCase();
+    const platforms = (p.platforms || []).map((pl: string) => pl.toLowerCase());
+
+    // 1. Exact matches
+    if (name === cleanQuery || name === translatedQuery) {
+      score += 200;
+    } else if (name.includes(cleanQuery) || name.includes(translatedQuery)) {
+      score += 100;
+    }
+
+    // 2. Word matches and alias checks
+    const checkWordMatch = (word: string) => {
+      let wordScore = 0;
+      
+      // Match in name
+      if (name.includes(word)) {
+        wordScore += 30;
+      }
+      
+      // Match in aliases
+      for (const [key, aliasList] of Object.entries(aliases)) {
+        if (word === key || name.includes(key)) {
+          for (const alias of aliasList) {
+            if (name.includes(alias) || word === alias) {
+              wordScore += 25;
+            }
+          }
+        }
+      }
+
+      // Match in description
+      if (desc.includes(word)) {
+        wordScore += 10;
+      }
+
+      // Match in category
+      if (cat.includes(word)) {
+        wordScore += 15;
+      }
+
+      // Match in platform
+      if (platforms.includes(word)) {
+        wordScore += 5;
+      }
+
+      return wordScore;
+    };
+
+    // Calculate score based on original query words
+    queryWords.forEach(word => {
+      score += checkWordMatch(word);
+    });
+
+    // Calculate score based on layout-translated query words
+    if (cleanQuery !== translatedQuery) {
+      translatedQueryWords.forEach(word => {
+        score += checkWordMatch(word) * 0.8;
+      });
+    }
+
+    return { product: p, score };
+  });
+
+  // Filter and sort by score
+  return scored
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.product);
+}
+
+function CatalogContent() {
   const [selectedCategory, setSelectedCategory] = useState("Все игры");
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("popularity");
+
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query !== null) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<string[]>(["Все игры"]);
   const [loading, setLoading] = useState(true);
@@ -65,14 +208,37 @@ export default function CatalogPage() {
   // Reset pagination when filters change
   useEffect(() => {
     setVisibleCount(12);
-  }, [selectedCategory, selectedPlatform, searchQuery]);
+  }, [selectedCategory, selectedPlatform, searchQuery, sortBy]);
 
-  const filteredProducts = products.filter(p => {
+  // 1. Filter products by category and platform
+  const baseFiltered = products.filter(p => {
     const matchesCategory = selectedCategory === "Все игры" || p.category === selectedCategory;
-    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesPlatform = selectedPlatform ? p.platforms?.includes(selectedPlatform) : true;
-    return matchesCategory && matchesSearch && matchesPlatform;
+    return matchesCategory && matchesPlatform;
   });
+
+  // 2. Perform smart search (scoring, filtering by keyword matches, sorting by relevance)
+  let searchedProducts = baseFiltered;
+  if (searchQuery.trim()) {
+    searchedProducts = smartSearch(baseFiltered, searchQuery);
+  }
+
+  // 3. Apply secondary sorting if chosen
+  const sortedProducts = [...searchedProducts];
+  if (!searchQuery.trim() || sortBy !== "popularity") {
+    sortedProducts.sort((a, b) => {
+      const priceA = a.price * (1 - a.discount / 100);
+      const priceB = b.price * (1 - b.discount / 100);
+      
+      if (sortBy === "price-asc") return priceA - priceB;
+      if (sortBy === "price-desc") return priceB - priceA;
+      if (sortBy === "discount") return b.discount - a.discount;
+      // Default: popularity (rating descending)
+      return b.rating - a.rating;
+    });
+  }
+
+  const filteredProducts = sortedProducts;
 
   return (
     <div className="min-h-screen pt-10 pb-20 px-4 lg:px-8 max-w-7xl mx-auto">
@@ -160,15 +326,18 @@ export default function CatalogPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button variant="outline" className="border-white/5 bg-ps-navy/30 gap-2 min-w-[160px] justify-between">
-                    По популярности
+                    {sortBy === "popularity" && "По популярности"}
+                    {sortBy === "price-asc" && "Сначала дешевле"}
+                    {sortBy === "price-desc" && "Сначала дороже"}
+                    {sortBy === "discount" && "По скидке"}
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-ps-navy border-white/10 text-white w-[160px]">
-                  <DropdownMenuItem className="hover:bg-ps-blue/20">По популярности</DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-ps-blue/20">Сначала дешевле</DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-ps-blue/20">Сначала дороже</DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-ps-blue/20">По скидке</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-ps-blue/20 cursor-pointer font-medium" onClick={() => setSortBy("popularity")}>По популярности</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-ps-blue/20 cursor-pointer font-medium" onClick={() => setSortBy("price-asc")}>Сначала дешевле</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-ps-blue/20 cursor-pointer font-medium" onClick={() => setSortBy("price-desc")}>Сначала дороже</DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-ps-blue/20 cursor-pointer font-medium" onClick={() => setSortBy("discount")}>По скидке</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -255,6 +424,18 @@ export default function CatalogPage() {
         onClose={() => setIsCategoriesModalOpen(false)} 
       />
     </div>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-ps-blue border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <CatalogContent />
+    </Suspense>
   );
 }
 

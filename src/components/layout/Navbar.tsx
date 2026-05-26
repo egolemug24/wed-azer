@@ -37,6 +37,7 @@ const navLinks = [
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchVal, setSearchVal] = useState("");
   const pathname = usePathname();
   const router = useRouter();
   const { items: cartItems } = useCart();
@@ -44,6 +45,14 @@ export function Navbar() {
   const { user, isAuthenticated, openAuthModal, logout, checkSession } = useAuth();
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const favoritesCount = favoriteItems.length;
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchVal.trim()) {
+      router.push(`/catalog?search=${encodeURIComponent(searchVal.trim())}`);
+      setIsMobileMenuOpen(false);
+    }
+  };
 
   useEffect(() => {
     checkSession();
@@ -101,13 +110,15 @@ export function Navbar() {
         </nav>
 
         {/* Search Bar - Desktop */}
-        <div className="hidden md:flex flex-1 max-w-sm relative">
+        <form onSubmit={handleSearchSubmit} className="hidden md:flex flex-1 max-w-sm relative">
           <Input 
             placeholder="Поиск игр..." 
-            className="bg-ps-navy/50 border-white/10 focus:border-ps-blue/50 focus:ring-1 focus:ring-ps-blue/20 pl-10"
+            value={searchVal}
+            onChange={(e) => setSearchVal(e.target.value)}
+            className="bg-ps-navy/50 border-white/10 focus:border-ps-blue/50 focus:ring-1 focus:ring-ps-blue/20 pl-10 w-full"
           />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        </div>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground cursor-pointer" onClick={handleSearchSubmit} />
+        </form>
 
         {/* Actions */}
         <div className="flex items-center gap-2 lg:gap-4">
@@ -151,11 +162,11 @@ export function Navbar() {
 
           {/* Mobile Menu */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger>
+            <SheetTrigger render={
               <Button variant="ghost" size="icon" className="lg:hidden rounded-full">
                 <Menu className="w-6 h-6" />
               </Button>
-            </SheetTrigger>
+            } />
             <SheetContent side="right" className="bg-ps-dark border-white/10 w-[300px] overflow-y-auto">
               <SheetHeader>
                 <SheetTitle className="text-left flex items-center gap-2 mb-8">
@@ -165,6 +176,16 @@ export function Navbar() {
                   <span>ElStore-PlayStation</span>
                 </SheetTitle>
               </SheetHeader>
+              {/* Search Bar - Mobile */}
+              <form onSubmit={handleSearchSubmit} className="relative mb-6">
+                <Input 
+                  placeholder="Поиск игр..." 
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  className="bg-ps-navy/50 border-white/10 focus:border-ps-blue/50 focus:ring-1 focus:ring-ps-blue/20 pl-10 h-10 w-full text-white"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              </form>
               <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <Link key={link.href} href={link.href} className="w-full" onClick={() => setIsMobileMenuOpen(false)}>

@@ -22,7 +22,7 @@ export async function PATCH(req: Request) {
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { id, name, color, glow, price1, price3, price12, features, popular } = body;
+    const { id, name, color, glow, price1, price3, price12, features, popular, region, type } = body;
 
     if (!id) return NextResponse.json({ error: 'Missing plan ID' }, { status: 400 });
 
@@ -36,7 +36,9 @@ export async function PATCH(req: Request) {
         price3,
         price12,
         features,
-        popular
+        popular,
+        region,
+        type
       }
     });
 
@@ -53,7 +55,7 @@ export async function POST(req: Request) {
     if (!admin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { name, color, glow, price1, price3, price12, features, popular, order } = body;
+    const { name, color, glow, price1, price3, price12, features, popular, order, region, type } = body;
 
     const plan = await prisma.subscriptionPlan.create({
       data: {
@@ -65,7 +67,9 @@ export async function POST(req: Request) {
         price12,
         features,
         popular: popular || false,
-        order: order || 0
+        order: order || 0,
+        region: region || "TR",
+        type: type || "PS_PLUS"
       }
     });
 

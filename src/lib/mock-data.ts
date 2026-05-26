@@ -13,7 +13,7 @@ export const BANNERS = [
     id: 2,
     title: "EA SPORTS FC 25",
     subtitle: "Уже в продаже. Собери команду мечты.",
-    image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?q=80&w=2070&auto=format&fit=crop",
+    image: "/img/games/fc_25_cover.png",
     cta1: "Предзаказать",
     cta1Href: "/product/fc-25",
     cta2: "Подробнее",
@@ -37,7 +37,7 @@ export const PRODUCTS = [
     name: "EA SPORTS FC 25",
     price: 8999,
     discount: 10,
-    image: "https://images.unsplash.com/photo-1628277613967-6abca504d0ac?q=80&w=2070&auto=format&fit=crop",
+    image: "/img/games/fc_25_cover.png",
     platforms: ["PS4", "PS5"],
     category: "Спорт",
     rating: 4.8
@@ -47,7 +47,7 @@ export const PRODUCTS = [
     name: "Spider-Man 2",
     price: 6999,
     discount: 0,
-    image: "https://images.unsplash.com/photo-1612285330645-573574936657?q=80&w=2070&auto=format&fit=crop",
+    image: "/img/games/spiderman_2_cover.png",
     platforms: ["PS5"],
     category: "Экшен",
     rating: 4.9
@@ -57,7 +57,7 @@ export const PRODUCTS = [
     name: "God of War Ragnarok",
     price: 5999,
     discount: 30,
-    image: "https://images.unsplash.com/photo-1533236897111-3e94666b2edf?q=80&w=2070&auto=format&fit=crop",
+    image: "/img/games/god_of_war_cover.png",
     platforms: ["PS4", "PS5"],
     category: "Приключения",
     rating: 5.0
@@ -67,9 +67,10 @@ export const PRODUCTS = [
     name: "Elden Ring",
     price: 4999,
     discount: 15,
-    image: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?q=80&w=2070&auto=format&fit=crop",
+    image: "/img/games/elden_ring_cover.png",
     platforms: ["PS4", "PS5"],
     category: "RPG",
     rating: 4.9
   }
 ];
+

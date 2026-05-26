@@ -72,7 +72,7 @@ export function ProductCard({ product }: ProductCardProps) {
       whileHover={{ y: -8 }}
       className="group relative glass-card rounded-2xl overflow-hidden flex flex-col h-full"
     >
-      <Link href={`/product/${product.id}`} className="flex flex-col flex-grow">
+      <Link href={`/product/${product.id}`} className="flex flex-col">
         {/* Image Container */}
         <div className="relative aspect-[3/4] overflow-hidden">
           <img
@@ -127,38 +127,36 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-4 flex flex-col flex-grow">
+        <div className="p-4 flex flex-col pb-2">
           <div className="flex items-center gap-1 mb-2">
             <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
             <span className="text-[10px] text-muted-foreground">{product.rating}</span>
             <span className="text-[10px] text-muted-foreground ml-auto">{product.category}</span>
           </div>
           
-          <h3 className="font-bold text-sm mb-3 line-clamp-2 group-hover:text-ps-blue transition-colors">
+          <h3 className="font-bold text-sm mb-1 line-clamp-2 group-hover:text-ps-blue transition-colors h-10">
             {product.name}
           </h3>
-
-          <div className="mt-auto flex items-end justify-between gap-2">
-            <div className="flex flex-col">
-              {product.discount > 0 && (
-                <span className="text-xs text-muted-foreground line-through decoration-red-500/50">
-                  {product.price.toLocaleString()} ₽
-                </span>
-              )}
-              <span className="text-lg font-bold text-white text-glow">
-                {Math.round(discountedPrice).toLocaleString()} ₽
-              </span>
-            </div>
-          </div>
         </div>
       </Link>
       
-      {/* Add to cart button isolated from link */}
-      <div className="absolute bottom-4 right-4 z-10">
+      {/* Price & Cart Actions (Outside the Link) */}
+      <div className="p-4 pt-0 mt-auto flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+        <div className="flex flex-col">
+          {product.discount > 0 && (
+            <span className="text-xs text-muted-foreground line-through decoration-red-500/50">
+              {product.price.toLocaleString()} ₽
+            </span>
+          )}
+          <span className="text-lg font-bold text-white text-glow">
+            {Math.round(discountedPrice).toLocaleString()} ₽
+          </span>
+        </div>
+        
         <Button 
           onClick={handleAddToCart}
           size="sm" 
-          className="bg-ps-blue/10 hover:bg-ps-blue text-ps-blue hover:text-white border border-ps-blue/30 transition-all"
+          className="w-full sm:w-auto bg-ps-blue/10 hover:bg-ps-blue text-ps-blue hover:text-white border border-ps-blue/30 transition-all text-xs shrink-0 py-2 h-9"
         >
           В корзину
         </Button>

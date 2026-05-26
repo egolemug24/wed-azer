@@ -122,6 +122,8 @@ model SubscriptionPlan {
   features String[]
   popular  Boolean  @default(false)
   order    Int      @default(0)
+  region   String   @default("TR")
+  type     String   @default("PS_PLUS")
 }
 
 model SiteVisitor {
