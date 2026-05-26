@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { PRODUCTS } from '@/lib/mock-data';
 import { 
   ShieldCheck, 
   Zap, 
@@ -26,11 +25,53 @@ export default function ProductDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const { addItem } = useCart();
-  const product = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
-  
-  const [selectedPlatform, setSelectedPlatform] = useState(product.platforms[0]);
+
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedPlatform, setSelectedPlatform] = useState("");
   const [selectedEdition, setSelectedEdition] = useState("Standard");
   const [activationType, setActivationType] = useState("with-activation");
+
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    fetch(`/api/products/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch product");
+        return res.json();
+      })
+      .then(data => {
+        setProduct(data);
+        if (data.platforms && data.platforms.length > 0) {
+          setSelectedPlatform(data.platforms[0]);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-ps-blue border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center space-y-4">
+        <h2 className="text-2xl font-bold">Товар не найден</h2>
+        <Button onClick={() => router.push('/catalog')} className="bg-ps-blue">
+          В каталог
+        </Button>
+      </div>
+    );
+  }
 
   const discountedPrice = product.price * (1 - product.discount / 100);
 
@@ -72,7 +113,7 @@ export default function ProductDetailPage() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ps-dark/80 via-transparent to-transparent" />
             <div className="absolute bottom-6 left-6 flex gap-3">
-              {product.platforms.map(p => (
+              {product.platforms.map((p: string) => (
                 <Badge key={p} className="bg-ps-blue text-white px-3 py-1 font-bold">
                   {p}
                 </Badge>
@@ -86,9 +127,7 @@ export default function ProductDetailPage() {
               Описание
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Новые эмоции, которые манят пытливых игроков в футбольном симуляторе нового поколения.
-              {product.name} — это самый реалистичный опыт, созданный с помощью технологии HyperMotionV, 
-              над которой славно потрудились разработчики. Соберите команду мечты и доминируйте на поле.
+              {product.description}
             </p>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <li className="flex items-center gap-3 text-sm text-white/80">
@@ -147,7 +186,7 @@ export default function ProductDetailPage() {
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Платформа</p>
                   <div className="grid grid-cols-2 gap-3">
-                    {product.platforms.map(p => (
+                    {product.platforms.map((p: string) => (
                       <button
                         key={p}
                         onClick={() => setSelectedPlatform(p)}
