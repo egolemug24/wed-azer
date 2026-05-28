@@ -77,11 +77,13 @@ export function Hero() {
                         {banner.cta1}
                       </Button>
                     </Link>
-                    <Link href={banner.cta2Href}>
-                      <Button size="lg" variant="outline" className="border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 px-8 h-12 text-lg">
-                        {banner.cta2}
-                      </Button>
-                    </Link>
+                    {banner.cta2 && (
+                      <Link href={banner.cta2Href}>
+                        <Button size="lg" variant="outline" className="border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 px-8 h-12 text-lg">
+                          {banner.cta2}
+                        </Button>
+                      </Link>
+                    )}
                   </motion.div>
                 </motion.div>
               </div>
