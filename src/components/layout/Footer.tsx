@@ -29,7 +29,7 @@ export function Footer() {
             Игры, подписки и пополнение баланса в одном месте.
           </p>
           <div className="flex gap-4">
-            <a href="https://t.me/Elvin4ik99" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
+            <a href="https://t.me/ElStore_PlayStation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
               <Send className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
             </a>
             <a href="https://vk.com/elstore_playstation" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-ps-card flex items-center justify-center hover:bg-ps-blue transition-colors group cursor-pointer">
@@ -95,7 +95,7 @@ export function Footer() {
               <Send className="w-5 h-5 text-ps-blue shrink-0" />
               <div>
                 <p className="text-sm font-medium">Telegram</p>
-                <p className="text-sm text-muted-foreground">@Elvin4ik99</p>
+                <p className="text-sm text-muted-foreground">@ElStore_PlayStation</p>
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-ps-card rounded-lg border border-white/5">

@@ -263,7 +263,7 @@ export default function ProductDetailPage() {
                     В корзину
                   </Button>
                   
-                  <a href="https://t.me/Elvin4ik99" target="_blank" rel="noopener noreferrer" className="block w-full">
+                  <a href="https://t.me/ElStore_PlayStation" target="_blank" rel="noopener noreferrer" className="block w-full">
                     <Button 
                       variant="outline" 
                       className="w-full border-white/10 bg-white/5 hover:bg-ps-blue h-14 text-lg font-bold group"

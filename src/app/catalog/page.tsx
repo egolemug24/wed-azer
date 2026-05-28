@@ -301,7 +301,7 @@ function CatalogContent() {
           <div className="glass-card p-6 rounded-2xl border border-white/5 bg-gradient-to-br from-ps-blue/10 to-transparent">
              <h4 className="font-bold text-sm mb-2">Нужна помощь?</h4>
              <p className="text-xs text-muted-foreground mb-4">Не можете найти игру или возникли вопросы по оплате?</p>
-             <Button className="w-full bg-ps-blue hover:bg-ps-glow h-9 text-xs" onClick={() => window.open('https://t.me/Elvin4ik99', '_blank')}>
+             <Button className="w-full bg-ps-blue hover:bg-ps-glow h-9 text-xs" onClick={() => window.open('https://t.me/ElStore_PlayStation', '_blank')}>
                Написать в Telegram
              </Button>
           </div>

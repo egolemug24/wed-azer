@@ -23,7 +23,7 @@ export default function ContactsPage() {
           <div>
             <h3 className="text-xl font-bold mb-2">Telegram Поддержка</h3>
             <p className="text-sm text-muted-foreground mb-6">Самый быстрый способ получить помощь по заказу или задать вопрос.</p>
-            <Button className="w-full bg-ps-blue hover:bg-ps-glow font-bold" onClick={() => window.open('https://t.me/Elvin4ik99', '_blank')}>
+            <Button className="w-full bg-ps-blue hover:bg-ps-glow font-bold" onClick={() => window.open('https://t.me/ElStore_PlayStation', '_blank')}>
               Написать в Telegram <ExternalLink className="w-4 h-4 ml-2" />
             </Button>
           </div>

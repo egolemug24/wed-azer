@@ -398,7 +398,7 @@ export default function SubscriptionsPage() {
               )}
             </p>
           </div>
-          <a href="https://t.me/Elvin4ik99" target="_blank" rel="noopener noreferrer">
+          <a href="https://t.me/ElStore_PlayStation" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" className="border-ps-blue/30 text-ps-blue hover:bg-ps-blue hover:text-white shrink-0 px-8">
               Задать вопрос
             </Button>
