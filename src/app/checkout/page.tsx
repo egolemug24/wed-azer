@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const totalPrice = getTotalPrice();
 
   const [email, setEmail] = useState('');
-  const [messenger, setMessenger] = useState<'telegram' | 'viber' | 'whatsapp'>('telegram');
+  const [messenger, setMessenger] = useState<'telegram' | 'vk' | 'whatsapp'>('telegram');
   const [messengerContact, setMessengerContact] = useState('');
   const [errors, setErrors] = useState<{ email?: boolean; messengerContact?: boolean }>({});
 
@@ -117,7 +117,7 @@ export default function CheckoutPage() {
                   {[
                     { id: 'telegram', name: 'Telegram', color: 'hover:border-sky-500/50 has-[input:checked]:border-sky-500 has-[input:checked]:bg-sky-500/10' },
                     { id: 'whatsapp', name: 'WhatsApp', color: 'hover:border-emerald-500/50 has-[input:checked]:border-emerald-500 has-[input:checked]:bg-emerald-500/10' },
-                    { id: 'viber', name: 'Viber', color: 'hover:border-violet-500/50 has-[input:checked]:border-violet-500 has-[input:checked]:bg-violet-500/10' },
+                    { id: 'vk', name: 'VK', color: 'hover:border-blue-500/50 has-[input:checked]:border-blue-500 has-[input:checked]:bg-blue-500/10' },
                   ].map((m) => (
                     <label 
                       key={m.id} 
@@ -145,9 +145,9 @@ export default function CheckoutPage() {
                           <path d="M12.012 2c-5.506 0-9.988 4.482-9.988 9.988 0 1.76.457 3.479 1.327 4.993L2 22l5.147-1.351c1.47.8 3.12 1.22 4.865 1.22 5.506 0 9.988-4.482 9.988-9.988 0-5.506-4.482-9.988-9.988-9.988zm4.887 13.344c-.213.602-1.234 1.157-1.71 1.205-.457.046-.902.244-2.894-.585-2.544-1.059-4.175-3.666-4.302-3.834-.127-.168-1.045-1.39-1.045-2.654 0-1.264.662-1.885.897-2.13.235-.244.512-.305.682-.305.17 0 .341.002.49.009.155.007.362-.059.567.44.213.518.728 1.782.792 1.912.064.13.107.281.021.452-.086.171-.13.28-.258.428-.128.148-.27.33-.385.442-.128.128-.261.268-.112.525.149.256.662 1.091 1.417 1.762.973.864 1.792 1.134 2.048 1.262.256.128.406.107.556-.064.15-.171.643-.748.814-.997.171-.249.342-.208.577-.121.235.086 1.492.702 1.748.831.256.128.426.192.49.301.064.109.064.63-.149 1.232z"/>
                         </svg>
                       )}
-                      {m.id === 'viber' && (
-                        <svg className="w-5 h-5 text-violet-400" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M19.664 6.728c-.534-.888-1.294-1.637-2.193-2.16C15.82 3.633 13.972 3.328 12.062 3.328c-4.992 0-9.047 3.86-9.047 8.61 0 1.92.672 3.69 1.8 5.12l-1.067 3.42c-.085.27.042.56.297.66.085.03.176.04.263.02l3.473-1.05c1.29.74 2.76 1.14 4.28 1.14 4.99 0 9.047-3.86 9.047-8.61 0-2.31-.91-4.48-2.583-6.07l.032-.032zm-2.457 7.733c-.31.52-.77.92-1.31 1.13-.53.21-1.12.24-1.67.09-1.39-.38-2.67-1.16-3.71-2.2-1.04-1.04-1.82-2.32-2.2-3.71-.15-.55-.12-1.14.09-1.67.21-.54.61-1 1.13-1.31.35-.21.75-.32 1.16-.32.22 0 .43.04.64.12.44.17.76.54.89.99l.66 2.31c.11.39.02.81-.24 1.12l-.66.8c.24.46.54.89.91 1.26.37.37.8.67 1.26.91l.8-.66c.31-.26.73-.35 1.12-.24l2.31.66c.45.13.82.45.99.89.08.21.12.42.12.64 0 .41-.11.81-.32 1.16z"/>
+                      {m.id === 'vk' && (
+                        <svg className="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M19.14 7.66c.11-.36 0-.62-.51-.62h-1.68c-.43 0-.63.23-.74.48 0 0-.86 2.09-2.07 3.44-.39.39-.57.52-.78.52-.11 0-.27-.13-.27-.5V7.66c0-.42-.12-.62-.48-.62H10.1c-.27 0-.43.2-.43.39 0 .4.6.49.66 1.62v2.45c0 .54-.1.64-.31.64-.57 0-1.97-2.1-2.8-4.5-.16-.47-.32-.66-.75-.66H4.78c-.48 0-.58.23-.58.49 0 .46.59 2.74 2.76 5.79 1.45 2.07 3.48 3.2 5.34 3.2 1.11 0 1.25-.25 1.25-.68v-1.51c0-.49.1-.59.45-.59.26 0 .7.13 1.73 1.13 1.18 1.18 1.38 1.72 2.04 1.72h1.68c.48 0 .72-.25.58-.72-.15-.47-.7-.1.15-1.15-1.15-1.28-1.55-1.62-1.92-2.13-.1-.13-.27-.27-.27-.47s.07-.33.27-.6c.2-.27 1.62-2.33 1.78-3.08z"/>
                         </svg>
                       )}
                       <span>{m.name}</span>
@@ -161,7 +161,7 @@ export default function CheckoutPage() {
                 <label className="text-xs font-bold text-muted-foreground uppercase flex items-center gap-1">
                   {messenger === 'telegram' && "Telegram для связи"}
                   {messenger === 'whatsapp' && "WhatsApp для связи"}
-                  {messenger === 'viber' && "Viber для связи"}
+                  {messenger === 'vk' && "VK для связи"}
                   <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -174,7 +174,7 @@ export default function CheckoutPage() {
                   )}
                   <Input 
                     placeholder={
-                      messenger === 'telegram' ? "@username" : "+7 (999) 999-99-99"
+                      messenger === 'telegram' ? "@username" : messenger === 'vk' ? "id12345 или ссылка" : "+7 (999) 999-99-99"
                     } 
                     value={messengerContact}
                     onChange={(e) => {
@@ -201,7 +201,6 @@ export default function CheckoutPage() {
             </h3>
             <div className="space-y-4">
               {[
-                { name: "Банковская карта (РФ)", desc: "Без комиссии", icon: CreditCard },
                 { name: "СБП", desc: "Моментальная оплата", icon: Zap },
                 { name: "Криптовалюта", desc: "USDT, BTC, ETH", icon: Lock },
               ].map((method, i) => (
