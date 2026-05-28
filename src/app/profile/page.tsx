@@ -136,24 +136,8 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  const handleTopup = async () => {
-    setTopupLoading(true);
-    try {
-      // Simulate adding 1000 RUB for testing
-      const res = await fetch('/api/user/topup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 1000 })
-      });
-      if (res.ok) {
-        // Refresh profile data to see the new transaction and balance
-        await fetchProfile();
-      }
-    } catch (err) {
-      console.error('Topup failed', err);
-    } finally {
-      setTopupLoading(false);
-    }
+  const handleTopup = () => {
+    router.push('/top-up');
   };
 
   if (loading) {
@@ -202,10 +186,9 @@ export default function ProfilePage() {
             
             <Button 
               onClick={handleTopup}
-              disabled={topupLoading}
               className="w-full bg-ps-blue/10 hover:bg-ps-blue text-ps-blue hover:text-white border border-ps-blue/30 transition-all mb-4"
             >
-              {topupLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <PlusCircle className="w-4 h-4 mr-2" />} 
+              <PlusCircle className="w-4 h-4 mr-2" /> 
               Пополнить баланс
             </Button>
           </div>
