@@ -57,6 +57,26 @@ export function Footer() {
           <ul className="space-y-4">
             <li><Link href="/faq" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Как купить?</Link></li>
             <li><Link href="/guarantee" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Гарантии</Link></li>
+            <li>
+              <a 
+                href="https://www.avito.ru/brands/elstore444?src=sharing" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-ps-blue transition-colors text-sm"
+              >
+                Отзывы Авито
+              </a>
+            </li>
+            <li>
+              <a 
+                href="https://t.me/sprosi_otziv" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-muted-foreground hover:text-ps-blue transition-colors text-sm"
+              >
+                Отзывы Telegram
+              </a>
+            </li>
           </ul>
         </div>
 
