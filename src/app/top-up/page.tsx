@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Wallet, Zap, ShieldCheck, CreditCard, ChevronRight, Globe2 } from 'lucide-react';
+import { Wallet, Zap, ShieldCheck, ChevronRight, Globe2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +47,64 @@ export default function TopUpPage() {
       return (Number(uahAmount) || 0) * settings.rateUah;
     }
     return 0;
+  };
+
+  const handleTryAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const nativeEvent = e.nativeEvent as any;
+    
+    if (val === '') {
+      setTryAmount('');
+      return;
+    }
+
+    const numVal = Number(val);
+    if (numVal < 0) {
+      return;
+    }
+
+    if (tryAmount === '') {
+      const isSpinnerOrArrow = nativeEvent.data === null || nativeEvent.data === undefined;
+      if (isSpinnerOrArrow) {
+        if (numVal > 0) {
+          setTryAmount('250');
+        } else {
+          setTryAmount('');
+        }
+        return;
+      }
+    }
+
+    setTryAmount(val);
+  };
+
+  const handleUahAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const nativeEvent = e.nativeEvent as any;
+    
+    if (val === '') {
+      setUahAmount('');
+      return;
+    }
+
+    const numVal = Number(val);
+    if (numVal < 0) {
+      return;
+    }
+
+    if (uahAmount === '') {
+      const isSpinnerOrArrow = nativeEvent.data === null || nativeEvent.data === undefined;
+      if (isSpinnerOrArrow) {
+        if (numVal > 0) {
+          setUahAmount('250');
+        } else {
+          setUahAmount('');
+        }
+        return;
+      }
+    }
+
+    setUahAmount(val);
   };
 
   const isAmountInvalid = () => {
@@ -219,11 +277,12 @@ export default function TopUpPage() {
                           <Input 
                             placeholder="Минимум 250 TL" 
                             type="number"
+                            min="0"
                             className={`pl-4 pr-12 h-14 text-lg bg-white/5 ${
                               tryAmount && Number(tryAmount) < 250 ? 'border-red-500/50 focus:border-red-500' : 'border-white/10'
                             }`}
                             value={tryAmount}
-                            onChange={(e) => {setTryAmount(e.target.value); setSelectedAmount(null);}}
+                            onChange={(e) => {handleTryAmountChange(e); setSelectedAmount(null);}}
                           />
                           <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-white/50">₺</span>
                         </div>
@@ -256,11 +315,12 @@ export default function TopUpPage() {
                         <Input 
                           placeholder="Минимум 250 UAH" 
                           type="number"
+                          min="0"
                           className={`pl-4 pr-12 h-14 text-lg bg-white/5 ${
                             uahAmount && Number(uahAmount) < 250 ? 'border-red-500/50 focus:border-red-500' : 'border-white/10'
                           }`}
                           value={uahAmount}
-                          onChange={(e) => setUahAmount(e.target.value)}
+                          onChange={handleUahAmountChange}
                         />
                         <span className="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-white/50">₴</span>
                       </div>
@@ -292,7 +352,6 @@ export default function TopUpPage() {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { name: "Банковская карта", desc: "Visa, Mastercard, МИР", icon: CreditCard },
                 { name: "СБП", desc: "Система Быстрых Платежей", icon: Zap },
               ].map((method, i) => (
                 <div key={i} className="glass-card p-5 rounded-2xl border border-white/5 flex items-center gap-4 cursor-pointer hover:border-ps-blue/50 transition-all group">
