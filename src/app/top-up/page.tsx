@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Wallet, Zap, ShieldCheck, ChevronRight, Globe2 } from 'lucide-react';
+import { Wallet, Zap, ShieldCheck, ChevronRight, Globe2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -353,6 +353,7 @@ export default function TopUpPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
                 { name: "СБП", desc: "Система Быстрых Платежей", icon: Zap },
+                { name: "Криптовалюта", desc: "USDT, BTC, ETH", icon: Lock },
               ].map((method, i) => (
                 <div key={i} className="glass-card p-5 rounded-2xl border border-white/5 flex items-center gap-4 cursor-pointer hover:border-ps-blue/50 transition-all group">
                    <div className="w-12 h-12 bg-ps-blue/10 rounded-xl flex items-center justify-center group-hover:bg-ps-blue/20">
