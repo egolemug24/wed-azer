@@ -38,11 +38,6 @@ export default function Home() {
                   Выбрать тариф
                 </Button>
               </Link>
-              <Link href="/faq">
-                <Button size="lg" variant="ghost" className="hover:bg-white/5">
-                  Все преимущества
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
