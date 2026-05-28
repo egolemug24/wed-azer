@@ -47,7 +47,7 @@ export function Footer() {
           <ul className="space-y-4">
             <li><Link href="/catalog" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Игры PS4 / PS5</Link></li>
             <li><Link href="/subscriptions" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Подписки PS Plus</Link></li>
-            <li><Link href="/top-up" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Пополнение кошелька</Link></li>
+            <li><Link href="/top-up" className="text-muted-foreground hover:text-ps-blue transition-colors text-sm">Пополнение баланса</Link></li>
           </ul>
         </div>
 
