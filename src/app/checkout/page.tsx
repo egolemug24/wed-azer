@@ -26,6 +26,7 @@ export default function CheckoutPage() {
   const [email, setEmail] = useState('');
   const [messenger, setMessenger] = useState<'telegram' | 'vk' | 'whatsapp'>('telegram');
   const [messengerContact, setMessengerContact] = useState('');
+  const [accountOption, setAccountOption] = useState<'personal' | 'new'>('personal');
   const [errors, setErrors] = useState<{ email?: boolean; messengerContact?: boolean }>({});
 
   const handlePayment = (e: React.MouseEvent) => {
@@ -243,6 +244,48 @@ export default function CheckoutPage() {
               ))}
             </div>
 
+            {/* Account Option Selector */}
+            <div className="space-y-3 pt-2">
+              <p className="text-xs font-bold text-white/50 uppercase">Параметры аккаунта</p>
+              <div className="grid grid-cols-2 gap-3">
+                <label className={cn(
+                  "glass-card p-3 rounded-xl border border-white/5 flex flex-col items-center justify-center text-center cursor-pointer transition-all",
+                  accountOption === 'personal' ? "border-ps-blue bg-ps-blue/10 text-white" : "text-white/40 hover:text-white/80"
+                )}>
+                  <input 
+                    type="radio" 
+                    name="account-option" 
+                    value="personal"
+                    checked={accountOption === 'personal'}
+                    onChange={() => setAccountOption('personal')}
+                    className="sr-only" 
+                  />
+                  <span className="text-[11px] font-black uppercase tracking-wider">На личный аккаунт</span>
+                  <span className="text-[9px] text-muted-foreground mt-1">Бесплатно</span>
+                </label>
+                <label className={cn(
+                  "glass-card p-3 rounded-xl border border-white/5 flex flex-col items-center justify-center text-center cursor-pointer transition-all",
+                  accountOption === 'new' ? "border-ps-blue bg-ps-blue/10 text-white" : "text-white/40 hover:text-white/80"
+                )}>
+                  <input 
+                    type="radio" 
+                    name="account-option" 
+                    value="new"
+                    checked={accountOption === 'new'}
+                    onChange={() => setAccountOption('new')}
+                    className="sr-only" 
+                  />
+                  <span className="text-[11px] font-black uppercase tracking-wider">Создать новый аккаунт</span>
+                  <span className="text-[9px] text-green-500 font-bold mt-1">(+300 ₽ к стоимости)</span>
+                </label>
+              </div>
+              {accountOption === 'new' && (
+                <p className="text-[10px] text-muted-foreground text-center italic mt-1">
+                  Мы создадим новый чистый аккаунт специально под ваш заказ
+                </p>
+              )}
+            </div>
+
             <Separator className="bg-white/5" />
 
             <div className="space-y-3">
@@ -250,13 +293,19 @@ export default function CheckoutPage() {
                 <span>Итого по товарам</span>
                 <span>{totalPrice.toLocaleString()} ₽</span>
               </div>
+              {accountOption === 'new' && (
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Создание нового аккаунта</span>
+                  <span>+300 ₽</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm text-green-500 font-bold">
                 <span>Скидка по промокоду</span>
                 <span>-0 ₽</span>
               </div>
               <div className="flex justify-between text-2xl font-black pt-2">
                 <span>К оплате</span>
-                <span className="text-ps-blue text-glow">{totalPrice.toLocaleString()} ₽</span>
+                <span className="text-ps-blue text-glow">{(totalPrice + (accountOption === 'new' ? 300 : 0)).toLocaleString()} ₽</span>
               </div>
             </div>
 
@@ -264,7 +313,7 @@ export default function CheckoutPage() {
               onClick={handlePayment}
               className="w-full bg-ps-blue hover:bg-ps-glow h-14 text-lg font-bold shadow-[0_0_20px_rgba(37,99,235,0.4)]"
             >
-              Оплатить заказ
+              Оплатить {(totalPrice + (accountOption === 'new' ? 300 : 0)).toLocaleString()} ₽
             </Button>
 
             <div className="flex items-center gap-2 justify-center text-[10px] text-muted-foreground">
