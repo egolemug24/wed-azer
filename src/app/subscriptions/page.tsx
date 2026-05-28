@@ -195,7 +195,7 @@ export default function SubscriptionsPage() {
           </Button>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full max-w-3xl">
+        <div className="flex flex-col gap-4 items-center justify-center w-full max-w-3xl">
           {/* Region Selector (Only for PS Plus and EA Play) */}
           {activeTab !== 'P3_SHARING' && (
             <div className="bg-ps-navy/40 p-1 rounded-xl border border-white/5 flex shrink-0 w-full sm:w-auto">
@@ -222,16 +222,16 @@ export default function SubscriptionsPage() {
 
           {/* Period Selector (Only for PS Plus and EA Play) */}
           {activeTab !== 'P3_SHARING' && (
-            <div className="bg-ps-navy/40 p-1 rounded-xl border border-white/5 flex w-full sm:w-auto flex-1">
+            <div className="bg-ps-navy/40 p-1 rounded-xl border border-white/5 flex w-full sm:w-auto">
               {["1", "3", "12"].map((p) => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
-                  className={`flex-1 py-2.5 rounded-lg text-xs font-black transition-all ${
+                  className={`flex-1 px-6 py-2.5 rounded-lg text-xs font-black transition-all ${
                     period === p ? "bg-ps-blue text-white shadow-sm" : "text-white/40 hover:text-white"
                   }`}
                 >
-                  {p} {p === "1" ? "месяц" : p === "3" ? "3 месяца" : "12 месяцев (Год)"}
+                  {p === "1" ? "1 месяц" : p === "3" ? "3 месяца" : "12 месяцев"}
                 </button>
               ))}
             </div>
