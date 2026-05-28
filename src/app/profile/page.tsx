@@ -1,22 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { 
   User as UserIcon, 
   Settings, 
   History, 
   Heart, 
-  Wallet, 
   LogOut,
   Shield,
   Star,
   ChevronRight,
-  PlusCircle,
   Gamepad2,
   RefreshCcw,
   Loader2,
   BarChart3,
-  Users
+  Users,
+  Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -54,6 +53,7 @@ type UserProfile = {
   email: string | null;
   role: string;
   balance: number;
+  image: string | null;
   transactions: Transaction[];
   orders: Order[];
 };
@@ -63,8 +63,10 @@ export default function ProfilePage() {
   const { logout } = useAuth();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'orders' | 'transactions' | 'analytics'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'analytics'>('orders');
   const [topupLoading, setTopupLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [settings, setSettings] = useState<any>(null);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -132,13 +134,50 @@ export default function ProfilePage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Изображение слишком большое. Максимальный размер 2 МБ.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadstart = () => setUploading(true);
+    reader.onload = async () => {
+      try {
+        const base64 = reader.result as string;
+        const res = await fetch('/api/user/profile', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64 })
+        });
+
+        if (res.ok) {
+          setUser(prev => prev ? { ...prev, image: base64 } : null);
+        } else {
+          alert('Не удалось обновить фотографию профиля');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Ошибка при загрузке изображения');
+      } finally {
+        setUploading(false);
+      }
+    };
+    reader.onerror = () => {
+      alert('Ошибка при чтении файла');
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  const handleTopup = () => {
-    router.push('/top-up');
-  };
+
 
   if (loading) {
     return (
@@ -172,25 +211,36 @@ export default function ProfilePage() {
           <div className="glass-card p-8 rounded-3xl border border-white/5 text-center relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-ps-blue shadow-[0_0_15px_rgba(37,99,235,0.8)]" />
             
-            <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-ps-blue shadow-[0_0_20px_rgba(37,99,235,0.3)] bg-ps-dark/50 flex items-center justify-center">
-                <UserIcon className="w-12 h-12 text-white/50" />
+            <div className="relative inline-block mb-4 group/avatar cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-ps-blue shadow-[0_0_20px_rgba(37,99,235,0.3)] bg-ps-dark/50 flex items-center justify-center relative">
+                {uploading ? (
+                  <Loader2 className="w-8 h-8 animate-spin text-ps-blue" />
+                ) : user.image ? (
+                  <img src={user.image} alt={user.name || 'Аватар'} className="w-full h-full object-cover" />
+                ) : (
+                  <UserIcon className="w-12 h-12 text-white/50" />
+                )}
+                
+                {!uploading && (
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="w-6 h-6 text-white" />
+                  </div>
+                )}
               </div>
               <Badge className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-ps-blue text-[10px] font-bold border-ps-dark border-2">
                 Уровень 1
               </Badge>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
             </div>
             
             <h2 className="text-2xl font-bold mb-1 tracking-tight">{user.name || 'Пользователь'}</h2>
-            <p className="text-xs text-muted-foreground mb-6">{user.email}</p>
-            
-            <Button 
-              onClick={handleTopup}
-              className="w-full bg-ps-blue/10 hover:bg-ps-blue text-ps-blue hover:text-white border border-ps-blue/30 transition-all mb-4"
-            >
-              <PlusCircle className="w-4 h-4 mr-2" /> 
-              Пополнить баланс
-            </Button>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
           </div>
 
           <div className="glass-card rounded-2xl border border-white/5 overflow-hidden">
@@ -203,15 +253,7 @@ export default function ProfilePage() {
               <History className="w-5 h-5" />
               История покупок
             </button>
-            <button
-              onClick={() => setActiveTab('transactions')}
-              className={`w-full flex items-center gap-4 px-6 py-4 text-sm font-medium transition-all hover:bg-white/5 ${
-                activeTab === 'transactions' ? "bg-ps-blue/10 text-ps-blue border-r-2 border-ps-blue" : "text-white/60"
-              }`}
-            >
-              <Wallet className="w-5 h-5" />
-              История пополнений
-            </button>
+
             {user.role === 'ADMIN' && (
               <button
                 onClick={() => setActiveTab('analytics')}
@@ -237,18 +279,9 @@ export default function ProfilePage() {
         <main className="lg:col-span-9 space-y-8">
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="glass-card p-6 rounded-2xl border border-white/5 relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-ps-blue/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-               <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest mb-1">Баланс кошелька</p>
-               <h3 className="text-3xl font-black text-glow">{user.balance.toLocaleString()} ₽</h3>
-            </div>
             <div className="glass-card p-6 rounded-2xl border border-white/5">
                <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest mb-1">Всего покупок</p>
                <h3 className="text-3xl font-black">{user.orders.length}</h3>
-            </div>
-            <div className="glass-card p-6 rounded-2xl border border-white/5">
-               <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest mb-1">Всего пополнений</p>
-               <h3 className="text-3xl font-black">{user.transactions.filter(t => t.type === 'TOPUP').length}</h3>
             </div>
           </div>
 
@@ -256,7 +289,7 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold">
-                {activeTab === 'orders' ? 'История покупок' : activeTab === 'transactions' ? 'История пополнений' : 'Аналитика сайта'}
+                {activeTab === 'orders' ? 'История покупок' : 'Аналитика сайта'}
               </h2>
             </div>
 
@@ -338,9 +371,7 @@ export default function ProfilePage() {
                 <div className="text-center py-10 text-white/50">У вас еще нет покупок</div>
               )}
               
-              {activeTab === 'transactions' && user.transactions.length === 0 && (
-                <div className="text-center py-10 text-white/50">У вас еще нет пополнений баланса</div>
-              )}
+
 
               {activeTab === 'orders' && user.orders.map((order) => (
                 <motion.div
@@ -384,41 +415,7 @@ export default function ProfilePage() {
                 </motion.div>
               ))}
 
-              {activeTab === 'transactions' && user.transactions.map((tx) => (
-                <motion.div
-                  key={tx.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="glass-card p-5 rounded-2xl border border-white/5 flex flex-col md:flex-row items-center gap-6 group hover:border-ps-blue/30 transition-all"
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center border shrink-0 ${
-                    tx.type === 'TOPUP' ? 'bg-green-500/10 border-green-500/20 text-green-500' : 'bg-red-500/10 border-red-500/20 text-red-500'
-                  }`}>
-                    {tx.type === 'TOPUP' ? <PlusCircle className="w-6 h-6" /> : <Wallet className="w-6 h-6" />}
-                  </div>
-                  
-                  <div className="flex-1 text-center md:text-left space-y-1">
-                    <div className="flex items-center gap-2 justify-center md:justify-start">
-                      <h4 className="font-bold">{tx.type === 'TOPUP' ? 'Пополнение баланса' : 'Списание средств'}</h4>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Транзакция #{tx.id.slice(-6).toUpperCase()} • {formatDate(tx.createdAt)}
-                    </p>
-                  </div>
 
-                  <div className="flex items-center gap-8">
-                    <div className="text-right">
-                      <p className={`font-bold text-lg ${tx.type === 'TOPUP' ? 'text-green-500' : 'text-white'}`}>
-                        {tx.type === 'TOPUP' ? '+' : '-'}{tx.amount.toLocaleString()} ₽
-                      </p>
-                      <div className="flex items-center gap-1 text-green-500 justify-end">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        <span className="text-[10px] font-bold uppercase">{tx.status}</span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
             </div>
           </div>
         </main>

@@ -5,6 +5,7 @@ type User = {
   name: string | null;
   email: string | null;
   role: string;
+  image?: string | null;
 } | null;
 
 interface AuthState {

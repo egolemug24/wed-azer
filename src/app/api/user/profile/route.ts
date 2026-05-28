@@ -18,6 +18,7 @@ export async function GET() {
         email: true,
         role: true,
         balance: true,
+        image: true,
         transactions: {
           orderBy: { createdAt: 'desc' }
         },
@@ -43,6 +44,36 @@ export async function GET() {
     return NextResponse.json({ user });
   } catch (error: any) {
     console.error('Profile fetch error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const sessionUser = await getSessionUser();
+    
+    if (!sessionUser) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { image } = await req.json();
+
+    const updatedUser = await prisma.user.update({
+      where: { id: sessionUser.id },
+      data: { image },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        balance: true,
+        image: true
+      }
+    });
+
+    return NextResponse.json({ user: updatedUser });
+  } catch (error: any) {
+    console.error('Profile update error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

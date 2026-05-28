@@ -146,8 +146,15 @@ export function Navbar() {
 
           {isAuthenticated ? (
             <div className="hidden sm:flex items-center gap-4">
-              <Link href="/profile" className="text-sm font-medium hover:text-ps-blue transition-colors cursor-pointer">
-                {user?.name || user?.email}
+              <Link href="/profile" className="flex items-center gap-2 text-sm font-medium hover:text-ps-blue transition-colors cursor-pointer group">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-white/10 bg-ps-dark/50 flex items-center justify-center shrink-0">
+                  {user?.image ? (
+                    <img src={user.image} alt={user.name || 'Аватар'} className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="w-4 h-4 text-white/50" />
+                  )}
+                </div>
+                <span>{user?.name || user?.email}</span>
               </Link>
               <Button onClick={() => { logout(); router.push('/'); }} variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-400/10">
                 Выйти
