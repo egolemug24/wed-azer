@@ -1,0 +1,11 @@
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const origin = new URL(request.url).origin;
+  return NextResponse.redirect(`${origin}/payment/fail/fail-page`, 303);
+}
+
+export async function GET(request: Request) {
+  const origin = new URL(request.url).origin;
+  return NextResponse.redirect(`${origin}/payment/fail/fail-page`, 303);
+}
