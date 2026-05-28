@@ -35,7 +35,6 @@ export async function POST(request: Request) {
     }
 
     // Подготовка данных для Pally API
-    const origin = request.headers.get('origin') || new URL(request.url).origin;
     const formData = new URLSearchParams();
     formData.append('amount', amount.toString());
     formData.append('order_id', transaction.id);
@@ -43,8 +42,6 @@ export async function POST(request: Request) {
     formData.append('type', 'normal');
     formData.append('shop_id', PALLY_SHOP_ID);
     formData.append('currency_in', 'RUB');
-    formData.append('success_url', `${origin}/payment/success`);
-    formData.append('fail_url', `${origin}/payment/fail`);
 
     // Делаем запрос к API кассы
     // Документация может использовать разные домены, используем pal24.pro или pally.info
