@@ -32,14 +32,29 @@ export function Hero() {
         {BANNERS.map((banner) => (
           <SwiperSlide key={banner.id}>
             <div className="relative w-full h-full">
-              {/* Background Image */}
-              <div 
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
-                style={{ backgroundImage: `url(${banner.image})` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
-              </div>
+              {/* Background Video or Image */}
+              {banner.video ? (
+                <div className="absolute inset-0 overflow-hidden">
+                  <video 
+                    src={banner.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
+                </div>
+              ) : (
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
+                  style={{ backgroundImage: `url(${banner.image})` }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
+                </div>
+              )}
 
               {/* Content */}
               <div className="relative z-10 h-full flex flex-col justify-center px-4 lg:px-20 max-w-7xl mx-auto">
@@ -53,7 +68,7 @@ export function Hero() {
                     className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 tracking-tight leading-tight text-glow"
                   >
                     {banner.title.split(' ').map((word, i) => (
-                      <span key={i} className={word.includes('подписки') || word.includes('FC') ? 'text-ps-blue' : ''}>
+                      <span key={i} className={word.includes('подписки') || word.includes('FC') || word.includes('UFC') ? 'text-ps-blue' : ''}>
                         {word}{' '}
                       </span>
                     ))}
