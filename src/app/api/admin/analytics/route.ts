@@ -1,20 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers';
-import * as jwt from 'jsonwebtoken';
-
-async function verifyAdmin() {
-  const token = (await cookies()).get('auth-token')?.value;
-  if (!token) return null;
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string };
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-    if (user?.role === 'ADMIN') return user;
-    return null;
-  } catch {
-    return null;
-  }
-}
+import { verifyAdmin } from '@/lib/auth';
 
 export async function GET() {
   try {
@@ -43,19 +29,100 @@ export async function GET() {
     const ordersWeek = await prisma.order.findMany({ where: { status: 'COMPLETED', createdAt: { gte: startOfWeek } } });
     const ordersMonth = await prisma.order.findMany({ where: { status: 'COMPLETED', createdAt: { gte: startOfMonth } } });
 
-    const salesDay = ordersDay.reduce((sum, order) => sum + 1, 0); // items or orders? let's use orders
-    const salesWeek = ordersWeek.reduce((sum, order) => sum + 1, 0);
-    const salesMonth = ordersMonth.reduce((sum, order) => sum + 1, 0);
+    const salesDay = ordersDay.length;
+    const salesWeek = ordersWeek.length;
+    const salesMonth = ordersMonth.length;
 
     const revenueDay = ordersDay.reduce((sum, order) => sum + order.total, 0);
     const revenueWeek = ordersWeek.reduce((sum, order) => sum + order.total, 0);
     const revenueMonth = ordersMonth.reduce((sum, order) => sum + order.total, 0);
 
+    // Total counts
+    const totalUsers = await prisma.user.count();
+    const totalOrdersCount = await prisma.order.count();
+    const totalRevenue = await prisma.order.aggregate({
+      _sum: { total: true },
+      where: { status: 'COMPLETED' }
+    });
+    const totalRevenueSum = totalRevenue._sum.total || 0;
+
+    // Recent logins (15 users with recent login times)
+    const recentLogins = await prisma.user.findMany({
+      orderBy: { lastLogin: 'desc' },
+      take: 15,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        lastLogin: true,
+        createdAt: true
+      }
+    });
+
+    // Recent registrations
+    const recentRegistrations = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 15,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true
+      }
+    });
+
+    // Recent orders with details
+    const recentOrders = await prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 15,
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true
+          }
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                image: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Recent transactions (top-ups and purchases)
+    const recentTransactions = await prisma.transaction.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 15,
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true
+          }
+        }
+      }
+    });
+
     return NextResponse.json({
       onlineCount,
+      totalUsers,
+      totalOrdersCount,
+      totalRevenueSum,
       visitors: { day: visitorsDay, week: visitorsWeek, month: visitorsMonth },
       sales: { day: salesDay, week: salesWeek, month: salesMonth },
-      revenue: { day: revenueDay, week: revenueWeek, month: revenueMonth }
+      revenue: { day: revenueDay, week: revenueWeek, month: revenueMonth },
+      recentLogins,
+      recentRegistrations,
+      recentOrders,
+      recentTransactions
     });
 
   } catch (error) {
@@ -63,3 +130,4 @@ export async function GET() {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

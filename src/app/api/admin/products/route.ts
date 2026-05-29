@@ -1,20 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers';
-import * as jwt from 'jsonwebtoken';
-
-async function verifyAdmin() {
-  const token = (await cookies()).get('auth-token')?.value;
-  if (!token) return null;
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as { userId: string };
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-    if (user?.role === 'ADMIN') return user;
-    return null;
-  } catch {
-    return null;
-  }
-}
+import { verifyAdmin } from '@/lib/auth';
 
 export async function PATCH(req: Request) {
   try {

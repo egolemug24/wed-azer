@@ -39,3 +39,10 @@ export const getSessionUser = async () => {
 
   return user;
 };
+
+export const verifyAdmin = async () => {
+  const user = await getSessionUser();
+  if (user?.role === 'ADMIN') return user;
+  return null;
+};
+
