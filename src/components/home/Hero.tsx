@@ -34,27 +34,44 @@ export function Hero() {
             <div className="relative w-full h-full">
               {/* Background Video or Image */}
               {banner.video ? (
-                <div className="absolute inset-0 overflow-hidden">
-                  <video 
-                    src={banner.video}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
-                </div>
+                <>
+                  {/* Mobile Background Image (Optimized, avoids downloading heavy video) */}
+                  <div 
+                    className={`block md:hidden absolute inset-0 bg-cover bg-no-repeat transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100 ${
+                      banner.id === 2 ? 'bg-[position:75%_center]' : 'bg-center'
+                    }`}
+                    style={{ backgroundImage: `url(${banner.image})` }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/75 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
+                  </div>
+
+                  {/* Desktop Background Video */}
+                  <div className="hidden md:block absolute inset-0 overflow-hidden">
+                    <video 
+                      src={banner.video}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
+                  </div>
+                </>
               ) : (
                 <div 
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100"
+                  className={`absolute inset-0 bg-cover bg-no-repeat transition-transform duration-10000 scale-110 group-[.swiper-slide-active]:scale-100 ${
+                    banner.id === 2 ? 'bg-[position:75%_center]' : 'bg-center'
+                  }`}
                   style={{ backgroundImage: `url(${banner.image})` }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-ps-dark via-ps-dark/60 to-transparent" />
                   <div className="absolute inset-0 bg-gradient-to-t from-ps-dark via-transparent to-transparent" />
                 </div>
               )}
+
 
               {/* Content */}
               <div className="relative z-10 h-full flex flex-col justify-center px-4 lg:px-20 max-w-7xl mx-auto">

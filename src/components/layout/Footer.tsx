@@ -110,11 +110,6 @@ export function Footer() {
         <p className="text-xs text-muted-foreground">
           © 2024 ElStore-PlayStation. Все права защищены. PlayStation, PS5, PS4 являются товарными знаками Sony Interactive Entertainment Inc.
         </p>
-        <div className="flex items-center gap-6 grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-4" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-6" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Mir_logo.svg" alt="Mir" className="h-4" />
-        </div>
       </div>
     </footer>
   );
